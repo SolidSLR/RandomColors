@@ -4,10 +4,25 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public List<Material> colorList;
-    public GameObject player;
 
-    private Vector3 randomPos;
+    private static List<Color> colorList = new List<Color>() {
+
+        Color.black, 
+        Color.blue, 
+        Color.clear, 
+        Color.cyan, 
+        Color.gray, 
+        Color.green, 
+        Color.grey, 
+        Color.magenta, 
+        Color.white, 
+        Color.yellow
+        
+        };
+
+    private static List<int> usedPos = new List<int>();
+
+    public GameObject player;
 
     private Vector3 initPos;
     // Start is called before the first frame update
@@ -36,11 +51,9 @@ public class GameManager : MonoBehaviour
 
         int limit = 0;
 
-        while(limit < 6){
+        while(limit < colorList.Count){
 
-            yield return new WaitForSeconds(5f);
-
-            
+            yield return new WaitForSeconds(1f);
 
             if(limit > 0){
 
@@ -50,33 +63,45 @@ public class GameManager : MonoBehaviour
             
             }
 
-            randomPos = new Vector3(initPos.x, initPos.y, initPos.z);
+            Vector3 randomPos = new Vector3(initPos.x, initPos.y, initPos.z);
 
-            SpawnPlayer(player);
+            SpawnPlayer(randomPos);
 
             limit++;
 
         }
     }
 
-    public void SpawnPlayer(GameObject player){ 
+    public void SpawnPlayer(Vector3 randomPos){ 
 
         GameObject newPlayer = Instantiate(player, randomPos, Quaternion.identity);
 
         PlayerColor(newPlayer);
 
-        Debug.Log("Ah, hice spawn");
+        Debug.Log("Ah, hice spawn "+newPlayer.gameObject.GetComponent<Renderer>().material.color);
 
     }
 
     public void PlayerColor(GameObject newPlayer){
         
-        int randNumb = Random.Range(0, colorList.Count);
+        newPlayer.gameObject.GetComponent<Renderer>().material.color = colorList[GenerateNumber()];
 
-        newPlayer.gameObject.GetComponent<Renderer>().material = colorList[randNumb];
-
-        colorList.RemoveAt(randNumb);
+        //colorList.RemoveAt(randNumb);
 
     }
 
+    public int GenerateNumber(){
+
+        int randNumb = Random.Range(0, colorList.Count);
+
+        while(usedPos.Contains(randNumb)){
+
+            randNumb = Random.Range(0, colorList.Count);
+
+        }
+
+        usedPos.Add(randNumb);
+
+        return randNumb;
+    }
 }
